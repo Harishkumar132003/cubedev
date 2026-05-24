@@ -1,0 +1,57 @@
+services:
+
+  cube:
+    image: cubejs/cube:latest
+    container_name: analytics_cube
+    environment:
+      CUBEJS_DB_TYPE: postgres
+      CUBEJS_DB_HOST: 103.189.89.187
+      CUBEJS_DB_PORT: 5432
+      CUBEJS_DB_NAME: cubedata
+      CUBEJS_DB_USER: admin
+      CUBEJS_DB_PASS: admin123
+      CUBEJS_API_SECRET: mysecretkey123
+      CUBEJS_DEV_MODE: "true"
+      CUBEJS_SCHEMA_PATH: schema
+      NODE_ENV: development
+    volumes:
+      - ./cube:/cube/conf
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4000/livez', r => process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    pull_policy: build
+    container_name: analytics_api
+    environment:
+      CUBE_API_URL: http://cube:4000
+      CUBE_API_SECRET: mysecretkey123
+      PORT: 3000
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      LLM_API_KEY: ${LLM_API_KEY}
+      LLM_MODEL: ${LLM_MODEL}
+      CATALOG_DB_PATH: /app/data/cube-catalog.duckdb
+      # MongoDB Atlas config store — enrich script loads LLM + DB settings from here
+      CONFIG_MONGO_URI: mongodb+srv://wizzgeeks_db_user:wizzgeeks32145@cluster0.mf0fxiy.mongodb.net/?appName=Cluster0
+      CONFIG_MONGO_DB: cubedev
+      CONFIG_COLLECTION: cubedev
+      CONFIG_DOC_ID: 6a12f5e7ed9b977542cc407a
+    volumes:
+      - ./data:/app/data
+      - ./scripts:/app/scripts:ro
+      - ./cube/schema/cubes:/app/cube/schema/cubes
+    ports:
+      - "3000:3000"
+    depends_on:
+      cube:
+        condition: service_healthy
+    restart: unless-stopped

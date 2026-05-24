@@ -1,0 +1,10 @@
+{
+  "name": "cubedev-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for enriching Cube.dev schemas",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "duckdb": "^1.4.4",
+    "pg": "^8.21.0"
+  }
+}

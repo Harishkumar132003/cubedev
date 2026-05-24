@@ -1,0 +1,20 @@
+{
+  "name": "analytics-api",
+  "version": "1.0.0",
+  "description": "Natural language analytics API using Cube.dev",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "enrich": "node ../scripts/enrich-cubes.js",
+    "enrich:dry": "node ../scripts/enrich-cubes.js --dry-run"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "duckdb": "^1.1.3",
+    "express": "^4.18.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.0.0",
+    "pg": "^8.11.0"
+  }
+}
